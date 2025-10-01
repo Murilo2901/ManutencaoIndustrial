@@ -201,7 +201,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 👨‍💻 Autor
 
-Desenvolvido por [Seu Nome] - Sistema de Manutenção Industrial
+Desenvolvido por Murilo Kerschbaum - Sistema de Manutenção Industrial
 
 ---
 

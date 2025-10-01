@@ -1,17 +1,20 @@
 package org.example;
 
-import org.example.DAO.MaquinaDAO;
-import org.example.DAO.PecaDAO;
-import org.example.DAO.TecnicoDAO;
-import org.example.Model.Maquina;
-import org.example.Model.peca;
-import org.example.Model.Tecnicos;
+import org.example.DAO.*;
+import org.example.Model.*;
+import org.example.Util.Conexao;
+import org.example.database.Conexao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+public class Main {
     static Scanner SC = new Scanner(System.in);
     public static void main(String[] args) {
         inicio();
@@ -32,6 +35,7 @@ import java.util.Scanner;
         System.out.println("|__________________________________|");
 
         int opcao = SC.nextInt();
+        SC.nextLine();
 
         switch (opcao){
             case 1:{
@@ -40,17 +44,27 @@ import java.util.Scanner;
             }
             case 2:{
                 cadastrarTecnico();
+                break;
             }
             case 3:{
-                cadastarPeca();
+                cadastrarPeca();
+                break;
             }
             case 4:{
-                cadastrarOrdemManutencao();
+                cadastrarOrdemManutecao();
+                break;
+            }
+            case 5:{
+                associarPecasOrdem();
+                break;
             }
             case 0:{
                 sair = true;
                 break;
             }
+        }
+        if(!sair){
+            inicio();
         }
     }
     public static void cadastrarMaquina(){
@@ -108,85 +122,201 @@ import java.util.Scanner;
         }
     }
 
-    public static void cadastarPeca(){
-        System.out.println("Digite o nome da peça");
+    public static void cadastrarPeca(){
+        System.out.println("Digite o nome da peça: ");
         String nomePeca = SC.nextLine();
 
-        System.out.println("Digite o estoque inical");
+        System.out.println("Digite o estoque inicial da peça: ");
         double estoque = SC.nextDouble();
+        SC.nextLine();
 
-        if(nomePeca.isEmpty() && estoque>=0) {
-            var peca = new Peca(nomePeca, estoque);
-
-            var pecaDAO = new PecaDAO();
-
-            try {
-                if (pecaDAO.verificaDuplicacaoPeca(peca)) {
-                    pecaDAO.insertPeca(peca);
-                    System.out.println("Cadastrado");
-                } else {
-                    System.out.println("nome não pode estar null");
+        if(!nomePeca.isEmpty() && estoque>=0){
+            var peca = new Peca(nomePeca,estoque);
+            var pecaDao = new PecaDAO();
+            try{
+                if(!pecaDao.verificaDuplicacaoPeca(peca.getNome())){
+                    pecaDao.insertPeca(peca);
+                    System.out.println("Peça cadastrada com sucesso!");
+                }else{
+                    System.out.println("Peça já cadastrada!");
                 }
-                System.out.println("tecnico já cadastrado");
-            } catch (SQLException e) {
-                System.out.println("Erro ao cadastrar tecnico");
-                e.printStackTrace();
+            }catch (SQLException e){
+                System.out.println("Erro ao cadastrar peça");
             }
+        }else{
+            System.out.println("nome da peça não pode ser nulo e estoque não pode ser menor que zero!");
         }
     }
-
-    public static void cadastrarOrdemManutencao()throws SQLException{
-        System.out.println("Cadastrar ordem de manutenção");
-        String nomePeca = SC.nextLine();
-
-        System.out.println("Digite o estoque inical");
-        double estoque = SC.nextDouble();
-
-        var maquinaDAO = new MaquinaDAO();
+    public static void cadastrarOrdemManutecao(){
+        System.out.println("Cadastrar Ordem de Manutenção");
+        var maquinaDao = new MaquinaDAO();
         List<Maquina> maquinas = new ArrayList<>();
-        List<Integer> opcoes = new ArrayList<>();
+        List<Integer> opcoesMaquinas = new ArrayList<>();
         List<Tecnico> tecnicos = new ArrayList<>();
-        List<Integer> opcoesTecnico = new ArrayList<>();
-        try {
-            maquinas = maquinaDAO.listarMaquinasOperacional();
+        List<Integer> opcoesTecnicos = new ArrayList<>();
+
+        try{
+            maquinas = maquinaDao.listarMaquinasOperacional();
         }catch (SQLException e){
-            System.out.println("Erro ao buscar maquinas");
+            System.out.println("Erro ao buscar máquinas!");
             e.printStackTrace();
         }
 
         maquinas.forEach((maquina -> {
-            System.out.println("id" + maquina.getId());
-            System.out.println("NOME" + maquina.getNome());
-            System.out.println("Setor" + maquina.getSetor());
-            System.out.println("status" + maquina.getStatus());
+            System.out.println("ID DA MÁQUINA: " + maquina.getId());
+            System.out.println("NOME DA MÁQUINA: " + maquina.getNome());
+            System.out.println("SETOR DA MÁQUINA: " + maquina.getSetor());
+            System.out.println("STATUS DA MÁQUINA: " + maquina.getStatus());
 
-            opcoes.add(maquina.getId());
-
+            opcoesMaquinas.add(maquina.getId());
         }));
 
-        System.out.println("Selecione o id da máquina: ");
-        int idMaquina = SC.nextInt();
+        System.out.println("Selecione o id da maquina: ");
+        int idMaquina= SC.nextInt();
         SC.nextLine();
 
-        var tecnicoDAO = new TecnicoDAO();
+        var tecnicoDao = new TecnicoDAO();
 
-        if(opcoes.contains(idMaquina)){
-            try {
-                tecnicos = tecnicoDAO.listarTecnico();
+        if(opcoesMaquinas.contains(idMaquina)){
+            try{
+                tecnicos = tecnicoDao.listarTecnicos();
             }catch (SQLException e){
-                System.out.println("Erro");
+                System.out.println("Erro ao buscar técnicos");
                 e.printStackTrace();
             }
 
-            tecnicos.forEach((tecnico -> {
-                System.out.println("id" + tecnico.getId());
-                System.out.println("NOME" + tecnico.getNome());
-                System.out.println("Setor" + tecnico.getEspecialidade());
+            tecnicos.forEach(tecnico -> {
+                System.out.println("ID DO TÉCNICO: " + tecnico.getId());
+                System.out.println("NOME DO TÉCNICO: " + tecnico.getNome());
+                System.out.println("ESPECIALIDADE DO TÉCNICO: " + tecnico.getEspecialidade());
 
-                opcoesTecnico.add(tecnico.getId());
-            }));
+                opcoesTecnicos.add(tecnico.getId());
+            });
+
+            int idTecnico = SC.nextInt();
+            SC.nextLine();
+            var ordemManutencaoDao = new OrdemManutencaoDAO();
+            if(opcoesTecnicos.contains(idTecnico)){
+                var ordemManutencao = new OrdemManutencaoDAO(idMaquina, idTecnico, LocalDate.now(), "PENDENTE");
+                Connection conn = null;
+                try{
+                    conn = Conexao.conectar();
+                    conn.setAutoCommit(false);
+
+                    ordemManutencaoDao.insertOrdemManutencao(ordemManutencao,conn);
+                    maquinaDao.atualizarStatusManutencao(idMaquina,"EM_MANUTENCAO", conn);
+
+                    conn.commit();
+                    System.out.println("Ordem de manutenção criada com sucesso!");
+                }catch (SQLException e) {
+                    try{
+                        conn.rollback();
+                        conn.close();
+                    }catch (SQLException e2){
+                        e2.printStackTrace();
+                    }
+                    System.out.println("Erro ao conectar no banco de dados");
+                }finally {
+                    try{
+                        conn.close();
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+            }else{
+                System.out.println("Opção invalida!");
+            }
         }else{
-            System.out.println("id inválido!");
+            System.out.println("Id inválido!");
+        }
+    }
+    public static void associarPecasOrdem(){
+        boolean sair = false;
+        System.out.println("Associar Peças a ordem");
+        List<OrdemManutencaoPeca> ordemManutencaoPecas = new ArrayList<>();
+        List<Integer> opcoesOrdem = new ArrayList<>();
+        var ordemManutencaoDao= new OrdemManutencaoDAO();
+        try{
+            ordemManutencaoPecas = ordemManutencaoDao.listarOrdensPendentes();
+        }catch (SQLException e){
+            System.out.println("Erro ao buscar no banco de dados!");
+            e.printStackTrace();
+        }
+
+        System.out.println("\nORDENS PENDENTES: ");
+        ordemManutencaoPecas.forEach(ordem -> {
+
+            System.out.println("ID Ordem: " + ordem.getId());
+            System.out.println("ID Máquina: " + ordem.getId());
+            System.out.println("Nome Máquina: " + ordem.getNomeMaquina());
+            System.out.println("Id Técnico: " + ordem.getId());
+            System.out.println("Nome Técnico: " + ordem.getNomeTecnico());
+            System.out.println("Status: " + ordem.getStatus());
+            System.out.println("Status: " + ordem.getDataSolicitacao());
+
+            System.out.println("\n");
+
+            opcoesOrdem.add(ordem.getId());
+        });
+
+        System.out.println("Digite o ID da ordem desejada: ");
+        int idOrdem = SC.nextInt();
+        SC.nextLine();
+
+        var pecaDao = new PecaDAO();
+        List<Peca> pecas  = new ArrayList<>();
+        if(opcoesOrdem.contains(idOrdem)){
+            try{
+                pecas = pecaDao.listarPecas();
+            }catch (SQLException e){
+                System.out.println("Erro ao conectar no banco de dados!");
+                e.printStackTrace();
+            }
+            //while
+            List<Integer> opcoesPecas = new ArrayList<>();
+            System.out.println("Peças: ");
+            pecas.forEach(peca -> {
+
+                System.out.println("ID" + peca.getId());
+                System.out.println("NOME" + peca.getNome());
+                System.out.println("ESTOQUE" + peca.getEstoque());
+
+                opcoesPecas.add(peca.getId());
+            });
+
+            System.out.println("Digite o id da peça: ");
+            int idPeca = SC.nextInt();
+            SC.nextLine();
+
+            if(opcoesPecas.contains(idPeca)){
+                System.out.println("Digite a quantidade necessária: ");
+                double quantidade = SC.nextDouble();
+                SC.nextLine();
+
+                int indicePeca = opcoesPecas.indexOf(idPeca);
+
+                Peca pecaEscolhida = pecas.get(indicePeca);
+
+                if(pecaEscolhida.getEstoque() >= quantidade){
+                    var associarPecaDao = new AssociarPecaDAO();
+                    try{
+                        associarPecaDao.inserirAssociacaoOrdem(new OrdemPeca(idOrdem,idPeca,quantidade));
+                        pecas.remove(indicePeca);
+                        opcoesPecas.remove(indicePeca);
+                    }catch (SQLException e){
+                        System.out.println("Erro de conexão com o banco de dados!");
+                        e.printStackTrace();
+                    }
+                }else{
+                    System.out.println("estoque insuficiente!");
+                    return;
+                }
+            }else{
+                System.out.println("Id da peça invalida!");
+            }
+
+        }else{
+            System.out.println("Opção invalida!");
         }
     }
 }

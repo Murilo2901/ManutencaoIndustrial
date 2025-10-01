@@ -1,17 +1,17 @@
 package org.example.Model;
 
-public class Tecnicos {
+public class Tecnico {
     private int id;
     private String nome;
     private String especialidade;
 
-    public Tecnicos(int id, String nome, String especialidade) {
+    public Tecnico(int id, String nome, String especialidade) {
         this.id = id;
         this.nome = nome;
         this.especialidade = especialidade;
     }
 
-    public Tecnicos(String nome, String especialidade) {
+    public Tecnico(String nome, String especialidade) {
         this.nome = nome;
         this.especialidade = especialidade;
     }

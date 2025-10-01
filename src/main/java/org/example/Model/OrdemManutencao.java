@@ -5,11 +5,11 @@ import java.time.LocalDate;
 public class OrdemManutencao {
     private int id;
     private Maquina maquina;
-    private Tecnicos tecnicos;
+    private Tecnico tecnicos;
     private LocalDate dataSolicitada;
     private String status;
 
-    public OrdemManutencao(int id, Maquina maquina, Tecnicos tecnicos, LocalDate dataSolicitada, String status) {
+    public OrdemManutencao(int id, Maquina maquina, Tecnico tecnicos, LocalDate dataSolicitada, String status) {
         this.id = id;
         this.maquina = maquina;
         this.tecnicos = tecnicos;
@@ -17,7 +17,7 @@ public class OrdemManutencao {
         this.status = status;
     }
 
-    public OrdemManutencao(Maquina maquina, Tecnicos tecnicos, LocalDate dataSolicitada, String status) {
+    public OrdemManutencao(Maquina maquina, Tecnico tecnicos, LocalDate dataSolicitada, String status) {
         this.maquina = maquina;
         this.tecnicos = tecnicos;
         this.dataSolicitada = dataSolicitada;
@@ -32,7 +32,7 @@ public class OrdemManutencao {
         return maquina;
     }
 
-    public Tecnicos getTecnicos() {
+    public Tecnico getTecnicos() {
         return tecnicos;
     }
 
@@ -52,7 +52,7 @@ public class OrdemManutencao {
         this.maquina = maquina;
     }
 
-    public void setTecnicos(Tecnicos tecnicos) {
+    public void setTecnicos(Tecnico tecnicos) {
         this.tecnicos = tecnicos;
     }
 

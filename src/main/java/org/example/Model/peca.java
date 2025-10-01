@@ -1,6 +1,6 @@
 package org.example.Model;
 
-public class peca {
+public class Peca {
     private int id;
     private String  nome;
     private double estoque;
@@ -16,6 +16,9 @@ public class peca {
         this.estoque = estoque;
     }
 
+    public Peca(String nomePeca, double estoque) {
+    }
+
     @Override
     public String toString(){
         return "\n PEÇA " +
@@ -28,7 +31,7 @@ public class peca {
         return id;
     }
 
-    public String getNome() {
+    public Peca getNome() {
         return nome;
     }
 
